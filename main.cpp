@@ -1,7 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <pqxx/pqxx>
-
+#include <string>
 #include "exerciser.h"
 
 using namespace std;
@@ -34,8 +34,22 @@ string get_string(string file_name) {
   }
   return table_string;
 }
-void create_table(string table_string, connection * C) {
+void create_table(connection * C, string table_string) {
   execute_sql(table_string, C);
+}
+void insert_state_rows(connection * C, string state_string) {
+  stringstream ss;
+  string name;
+  int state_id;
+  int pos;
+  string delemitor = "\n";
+  while ((pos = state_string.find(delemitor)) != string::npos) {
+    ss << state_string;
+    ss >> state_id >> name;
+    //cout << state_id <<"," << name <<endl;
+    add_state(C, name);
+    state_string.erase(0, pos + delemitor.length());
+  }
 }
 
 int main(int argc, char * argv[]) {
@@ -69,7 +83,9 @@ int main(int argc, char * argv[]) {
   table_list.push_back("COLOR");
   drop_table(C, table_list);
   string table_string = get_string("tables.txt");
-  create_table(table_string, C);
+  create_table(C, table_string);
+  string state_string = get_string("state.txt");
+  insert_state_rows(C, state_string);
   //cout << table_string << '\n';
   exercise(C);
 
