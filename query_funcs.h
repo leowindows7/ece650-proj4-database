@@ -34,4 +34,12 @@ void query4(connection *C, string team_state, string team_color);
 
 void query5(connection *C, int num_wins);
 
+// my implementation
+
+void insert_team_rows(connection * C, string team_string);
+void drop_table(connection * C, vector<string> & table_list);
+void create_table(connection * C, string table_string);
+void insert_state_rows(connection * C, string state_string);
+void insert_color_rows(connection * C, string color_string);
+void insert_player_rows(connection * C, string player_string);
 #endif //_QUERY_FUNCS_

@@ -2,23 +2,11 @@
 #include <iostream>
 #include <pqxx/pqxx>
 #include <string>
+
 #include "exerciser.h"
 
 using namespace std;
 using namespace pqxx;
-
-void execute_sql(string sql_command, connection * C) {
-  work W(*C);
-  W.exec(sql_command);
-  W.commit();
-}
-
-void drop_table(connection * C, vector<string> & table_list) {
-  for (auto it = table_list.begin(); it != table_list.end(); ++it) {
-    string sql_command = "DROP TABLE IF EXISTS " + *it + " CASCADE;";
-    execute_sql(sql_command, C);
-  }
-}
 string get_string(string file_name) {
   string line;
   string table_string;
@@ -33,23 +21,6 @@ string get_string(string file_name) {
     cout << "cannot open tables file" << endl;
   }
   return table_string;
-}
-void create_table(connection * C, string table_string) {
-  execute_sql(table_string, C);
-}
-void insert_state_rows(connection * C, string state_string) {
-  stringstream ss;
-  string name;
-  int state_id;
-  int pos;
-  string delemitor = "\n";
-  while ((pos = state_string.find(delemitor)) != string::npos) {
-    ss << state_string;
-    ss >> state_id >> name;
-    //cout << state_id <<"," << name <<endl;
-    add_state(C, name);
-    state_string.erase(0, pos + delemitor.length());
-  }
 }
 
 int main(int argc, char * argv[]) {
@@ -86,7 +57,12 @@ int main(int argc, char * argv[]) {
   create_table(C, table_string);
   string state_string = get_string("state.txt");
   insert_state_rows(C, state_string);
-  //cout << table_string << '\n';
+  string color_string = get_string("color.txt");
+  insert_color_rows(C, color_string);
+  string team_string = get_string("team.txt");
+  insert_team_rows(C, team_string);
+  string player_string = get_string("player.txt");
+  insert_player_rows(C, player_string);
   exercise(C);
 
   //Close database connection
