@@ -13,11 +13,12 @@ void add_player(connection * C,
                 double bpg) {
   work W(*C);
   stringstream sql_command;
-  sql_command
-      << "INSERT INTO PLAYER (TEAM_ID, UNIFORM_NUM, FIRST_NAME, LAST_NAME, MPG, PPG, RPG, APG, SPG, BPG) VALUES ("
-      << team_id << ", " << jersey_num << ", " << W.quote(first_name) << ", "
-      << W.quote(last_name) << ", " << mpg << ", " << ppg << ", " << rpg << ", " << apg
-      << ", " << spg << ", " << bpg << ");";
+  sql_command << "INSERT INTO PLAYER "
+              << "(TEAM_ID, UNIFORM_NUM, FIRST_NAME, LAST_NAME, MPG, PPG, RPG, APG, SPG, "
+                 "BPG) VALUES ("
+              << team_id << ", " << jersey_num << ", " << W.quote(first_name) << ", "
+              << W.quote(last_name) << ", " << mpg << ", " << ppg << ", " << rpg << ", "
+              << apg << ", " << spg << ", " << bpg << ");";
   W.exec(sql_command.str());
   W.commit();
 }
@@ -39,15 +40,17 @@ void add_team(connection * C,
 
 void add_state(connection * C, string name) {
   work W(*C);
-  string sql_command = "INSERT INTO STATE (NAME) VALUES (" + W.quote(name) + ");";
-  W.exec(sql_command);
+  stringstream sql_command;
+  sql_command << "INSERT INTO STATE (NAME) VALUES (" + W.quote(name) + ");";
+  W.exec(sql_command.str());
   W.commit();
 }
 
 void add_color(connection * C, string name) {
   work W(*C);
-  string sql_command = "INSERT INTO COLOR (NAME) VALUES (" + W.quote(name) + ");";
-  W.exec(sql_command);
+  stringstream sql_command;
+  sql_command << "INSERT INTO COLOR (NAME) VALUES (" + W.quote(name) + ");";
+  W.exec(sql_command.str());
   W.commit();
 }
 
@@ -73,9 +76,33 @@ void query1(connection * C,
 }
 
 void query2(connection * C, string team_color) {
+  work W(*C);
+  stringstream sql_command;
+  sql_command << "SELECT TEAM.NAME FROM TEAM, COLOR "
+              << "WHERE COLOR.NAME = " << W.quote(team_color)
+              << " AND TEAM.COLOR_ID = COLOR.COLOR_ID;";
+  W.commit();
+  nontransaction N(*C);
+  result R(N.exec(sql_command.str()));
+  cout << "NAME" << endl;
+  for (auto it = R.begin(); it != R.end(); ++it) {
+    cout << it[0].as<string>() << endl;
+  }
 }
 
 void query3(connection * C, string team_name) {
+  work W(*C);
+  stringstream sql_command;
+  sql_command << "SELECT FIRST_NAME, LAST_NAME FROM PLAYER, TEAM "
+              << "WHERE PLAYER.TEAM_ID = TEAM.TEAM_ID AND TEAM.NAME = "
+              << W.quote(team_name) << " ORDER BY PPG DESC;";
+  W.commit();
+  nontransaction N(*C);
+  result R(N.exec(sql_command.str()));
+  cout << "FIRST_NAME LAST_NAME" << endl;
+  for (auto it = R.begin(); it != R.end(); ++it) {
+    cout << it[0].as<string>() << " " << it[1].as<string>() << endl;
+  }
 }
 
 void query4(connection * C, string team_state, string team_color) {
