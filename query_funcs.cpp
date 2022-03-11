@@ -1,4 +1,5 @@
 #include "query_funcs.h"
+
 #include <iomanip>
 void add_player(connection * C,
                 int team_id,
@@ -96,12 +97,15 @@ void query1(connection * C,
   result R(N.exec(sql_command.str()));
   //displayResult("", R);
   string delimetor = " ";
+  cout << "PLAYER_ID TEAM_ID UNIFORM_NUM FIRST_NAME LAST_NAME MPG PPG RPG APG SPG BPG"
+       << endl;
   for (auto it = R.begin(); it != R.end(); ++it) {
-    cout << it[0].as<int>() << delimetor << it[1].as<int>() << delimetor << it[2].as<int>() << delimetor
-         << it[3].as<string>() << delimetor << it[4].as<string>() << delimetor << it[5].as<int>() << delimetor
-         << it[6].as<int>() << delimetor << it[7].as<int>() << delimetor << it[8].as<int>() << delimetor
-         << fixed << setprecision(1) << it[9].as<double>() << delimetor << it[10].as<double>()
-         << endl;
+    cout << it[0].as<int>() << delimetor << it[1].as<int>() << delimetor
+         << it[2].as<int>() << delimetor << it[3].as<string>() << delimetor
+         << it[4].as<string>() << delimetor << it[5].as<int>() << delimetor
+         << it[6].as<int>() << delimetor << it[7].as<int>() << delimetor
+         << it[8].as<int>() << delimetor << fixed << setprecision(1) << it[9].as<double>()
+         << delimetor << it[10].as<double>() << endl;
   }
 }
 
@@ -134,7 +138,7 @@ void query4(connection * C, string team_state, string team_color) {
   stringstream sql_command;
   sql_command << "SELECT FIRST_NAME, LAST_NAME, UNIFORM_NUM FROM PLAYER, STATE, COLOR, "
                  "TEAM WHERE "
-              << "PLAYER.TEAM_ID = TEAM.TEAM_ID AND TEAM.STATE_ID = STATE.STATE_ID AND "
+              << "TEAM.STATE_ID = STATE.STATE_ID AND PLAYER.TEAM_ID = TEAM.TEAM_ID AND "
                  "TEAM.COLOR_ID = COLOR.COLOR_ID AND "
               << "COLOR.NAME = " << W.quote(team_color) << " AND "
               << "STATE.NAME = " << W.quote(team_state) << ";";
@@ -147,13 +151,13 @@ void query4(connection * C, string team_state, string team_color) {
 void query5(connection * C, int num_wins) {
   work W(*C);
   stringstream sql_command;
-  sql_command << "SELECT FIRST_NAME, LAST_NAME, NAME, WINS FROM PLAYER, TEAM WHERE "
-              << "PLAYER.TEAM_ID = TEAM.TEAM_ID AND WINS >" << num_wins << ";";
+  sql_command << "SELECT FIRST_NAME, LAST_NAME, NAME, WINS FROM PLAYER, TEAM "
+              << "WHERE PLAYER.TEAM_ID = TEAM.TEAM_ID AND WINS >" << num_wins << ";";
   W.commit();
   nontransaction N(*C);
   result R(N.exec(sql_command.str()));
   //cout << "FIRST_NAME LAST_NAME NAME WINS" << endl;
-  displayResult("FIRST_NAME LAST_NAME NAME WINS",R);
+  displayResult("FIRST_NAME LAST_NAME NAME WINS", R);
 }
 
 // my implementation
