@@ -9,18 +9,18 @@ using namespace std;
 using namespace pqxx;
 string get_string(string file_name) {
   string line;
-  string table_string;
+  string result_string;
   ifstream myfile(file_name);
   if (myfile.is_open()) {
     while (getline(myfile, line)) {
-      table_string += line + "\n";
+      result_string += line + "\n";
     }
     myfile.close();
   }
   else {
     cout << "cannot open tables file" << endl;
   }
-  return table_string;
+  return result_string;
 }
 
 int main(int argc, char * argv[]) {
