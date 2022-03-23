@@ -91,7 +91,25 @@ void query1(connection * C,
             double max_bpg) {
   work W(*C);
   stringstream sql_command;
-  sql_command << "SELECT * FROM PLAYER ";
+  sql_command << "SELECT * FROM PLAYER WHERE PLAYER_ID >= 0";
+  if (use_mpg != 0){
+    sql_command << " AND MPG >= " << min_mpg << " AND " << "MPG <= " << max_mpg;
+  }
+  if (use_ppg != 0){
+    sql_command << " AND PPG >= " << min_ppg << " AND " << "PPG <= " << max_ppg;
+  }
+  if (use_rpg != 0){
+    sql_command << " AND RPG >= " << min_rpg << " AND " << "RPG <= " << max_rpg;
+  }
+  if (use_apg != 0){
+    sql_command << " AND APG >= " << min_apg << " AND " << "APG <= " << max_apg;
+  }
+  if (use_spg != 0){
+    sql_command << " AND SPG >= " << min_spg << " AND " << "SPG <= " << max_spg;
+  }
+  if (use_bpg != 0){
+    sql_command << " AND BPG >= " << min_bpg << " AND " << "BPG <= " << max_bpg;
+  }
   W.commit();
   nontransaction N(*C);
   result R(N.exec(sql_command.str()));
@@ -99,6 +117,7 @@ void query1(connection * C,
   string delimetor = " ";
   cout << "PLAYER_ID TEAM_ID UNIFORM_NUM FIRST_NAME LAST_NAME MPG PPG RPG APG SPG BPG"
        << endl;
+  //cout << sql_command.str() << endl;
   for (auto it = R.begin(); it != R.end(); ++it) {
     cout << it[0].as<int>() << delimetor << it[1].as<int>() << delimetor
          << it[2].as<int>() << delimetor << it[3].as<string>() << delimetor
@@ -142,6 +161,7 @@ void query4(connection * C, string team_state, string team_color) {
                  "TEAM.COLOR_ID = COLOR.COLOR_ID AND "
               << "COLOR.NAME = " << W.quote(team_color) << " AND "
               << "STATE.NAME = " << W.quote(team_state) << ";";
+  
   W.commit();
   nontransaction N(*C);
   result R(N.exec(sql_command.str()));
@@ -156,17 +176,11 @@ void query5(connection * C, int num_wins) {
   W.commit();
   nontransaction N(*C);
   result R(N.exec(sql_command.str()));
-  //cout << "FIRST_NAME LAST_NAME NAME WINS" << endl;
   displayResult("FIRST_NAME LAST_NAME NAME WINS", R);
 }
 
 // my implementation
 
-// void execute_sql(string sql_command, connection * C) {
-//   work W(*C);
-//   W.exec(sql_command);
-//   W.commit();
-// }
 
 void drop_table(connection * C, vector<string> & table_list) {
   for (auto it = table_list.begin(); it != table_list.end(); ++it) {

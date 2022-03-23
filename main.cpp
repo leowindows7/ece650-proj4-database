@@ -18,7 +18,7 @@ string get_string(string file_name) {
     myfile.close();
   }
   else {
-    cout << "cannot open tables file" << endl;
+    cout << "cannot open the file" << endl;
   }
   return result_string;
 }
@@ -32,7 +32,7 @@ int main(int argc, char * argv[]) {
     //Parameters: database name, user name, user password
     C = new connection("dbname=ACC_BBALL user=postgres password=passw0rd");
     if (C->is_open()) {
-      cout << "Opened database successfully: " << C->dbname() << endl;
+      //cout << "Opened database successfully: " << C->dbname() << endl;
     }
     else {
       cout << "Can't open database" << endl;
